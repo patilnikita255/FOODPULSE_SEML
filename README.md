@@ -2399,3 +2399,5 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+#   F O O D P U L S E _ S E M L  
+ 
