@@ -12,14 +12,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, formatDate } from "@/data/mock";
+import { formatDate } from "@/data/mock";
 import { MEAL_TYPES, type MealRecord } from "@/data/types";
 
 export const Route = createFileRoute("/student/meal-history")({
   head: () => ({
     meta: [
       { title: "Meal History — FoodPulse Student Portal" },
-      { name: "description", content: "Review your past meal selections, attendance and ratings." },
+      { name: "description", content: "Review your past meal selections and ratings." },
       { property: "og:title", content: "Meal History — FoodPulse Student Portal" },
       { property: "og:description", content: "Filter and review your meal history with FoodPulse." },
     ],
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/student/meal-history")({
 });
 
 function MealHistoryPage() {
-  const { meals, rateMeal } = useApp();
+  const { meals, rateMeal, currentUserId } = useApp();
   const loading = useSimulatedLoad();
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -39,8 +39,8 @@ function MealHistoryPage() {
   const [feedbackText, setFeedbackText] = useState("");
 
   const myMeals = useMemo(
-    () => meals.filter((m) => m.studentId === CURRENT_STUDENT_ID).sort((a, b) => (a.date < b.date ? 1 : -1)),
-    [meals],
+    () => meals.filter((m) => m.studentId === currentUserId).sort((a, b) => (a.date < b.date ? 1 : -1)),
+    [meals, currentUserId],
   );
 
   const filtered = myMeals.filter((m) => {
@@ -70,7 +70,7 @@ function MealHistoryPage() {
     <div className="space-y-6">
       <PageHeader
         title="Meal History"
-        description="Track your past meal selections and rate the meals you attended."
+        description="Review your meal selections and submit ratings for meals."
         breadcrumbs={[{ label: "Student", to: "/student" }, { label: "Meal History" }]}
       />
 
@@ -100,8 +100,8 @@ function MealHistoryPage() {
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="Attended">Attended</SelectItem>
-                <SelectItem value="Missed">Missed</SelectItem>
+                <SelectItem value="Selected">Selected</SelectItem>
+                <SelectItem value="Skipped">Skipped</SelectItem>
                 <SelectItem value="Upcoming">Upcoming</SelectItem>
               </SelectContent>
             </Select>
@@ -128,7 +128,7 @@ function MealHistoryPage() {
                   <th className="px-4 py-2 font-semibold">Meal</th>
                   <th className="px-4 py-2 font-semibold">Menu</th>
                   <th className="px-4 py-2 font-semibold">Selection</th>
-                  <th className="px-4 py-2 font-semibold">Attendance</th>
+                  <th className="px-4 py-2 font-semibold">Meal Status</th>
                   <th className="px-4 py-2 font-semibold">Rating</th>
                 </tr>
               </thead>
@@ -171,7 +171,7 @@ function MealHistoryPage() {
                   <StatusBadge status={selected.selection} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">Attendance</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">Meal Status</p>
                   <StatusBadge status={selected.attendance} />
                 </div>
               </div>

@@ -28,7 +28,7 @@ import { Section, SectionHeading } from "@/components/fp/marketing/section";
 import { KpiCard } from "@/components/fp/kpi-card";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/store/app-store";
-import { addDays, BASE_DATE, formatDate, iso, weekdayName } from "@/data/mock";
+import { addDays, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -102,7 +102,7 @@ function Index() {
   const { consumption } = useApp();
 
   const last7 = [...consumption]
-    .filter((c) => c.date <= iso(BASE_DATE))
+    .filter((c) => c.date <= todayISO())
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(-21);
 

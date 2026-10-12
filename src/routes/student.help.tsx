@@ -20,14 +20,14 @@ const STEPS = [
   { icon: ClipboardList, title: "Subscribe to a plan", desc: "Visit Available Plans and pick a Weekly or Monthly plan that suits you." },
   { icon: CalendarCheck, title: "Select your meals daily", desc: "Use the Meal Calendar to select or skip Breakfast, Lunch and Dinner before the cutoff." },
   { icon: Utensils, title: "Attend & rate your meals", desc: "After eating, rate meals from Meal History to help the mess team improve." },
-  { icon: CreditCard, title: "Pay your bill", desc: "Check Current Bill for dues and mark payments as done (demo)." },
+  { icon: CreditCard, title: "Pay your bill", desc: "Check Current Bill for dues and report offline payments for staff verification." },
 ];
 
 const FAQS = [
   { q: "What is the meal selection cutoff?", a: "You must confirm or skip a meal by 10:00 PM the previous day. After this, the meal locks and cannot be changed." },
   { q: "Can I change a meal after the cutoff?", a: "No. Once locked, the selection is final for that meal. You can still rate it afterwards from Meal History." },
   { q: "How do I pause my subscription?", a: "Go to My Subscription and click Request Pause. The mess manager will review and approve your request." },
-  { q: "How do payments work in this demo?", a: "FoodPulse is a frontend prototype without a real payment gateway. Use 'Mark as Demo Payment' on the Current Bill page to simulate payment." },
+  { q: "How do payments work?", a: "Pay the mess office using its current payment method, then report the invoice. A manager verifies the payment before marking it paid." },
   { q: "Where can I raise a complaint?", a: "Use the Give Feedback page to submit a Complaint or Suggestion. Track responses under My Complaints." },
 ];
 

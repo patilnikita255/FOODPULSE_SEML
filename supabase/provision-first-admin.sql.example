@@ -1,0 +1,12 @@
+-- Run once in Supabase SQL Editor only after you sign up with this email and
+-- the PCCOE tenant seed has been applied. Replace the email first.
+update public.profiles
+set role = 'ADMIN'
+where lower(email) = lower('replace-with-your-admin-email@example.com')
+  and organization_id = (select id from public.organizations where slug = 'pccoe-mess1')
+  and status = 'ACTIVE';
+
+-- Confirm exactly one profile was promoted:
+select id, full_name, email, role, status
+from public.profiles
+where lower(email) = lower('replace-with-your-admin-email@example.com');

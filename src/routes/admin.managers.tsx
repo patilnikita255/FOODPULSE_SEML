@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useApp } from "@/store/app-store";
-import { formatDate, iso, BASE_DATE } from "@/data/mock";
+import { formatDate, todayISO } from "@/data/mock";
 import type { AppUser } from "@/data/types";
 import { Plus, Search } from "lucide-react";
 
@@ -35,7 +35,7 @@ const emptyManager: AppUser = {
   contact: "",
   role: "manager",
   status: "Active",
-  joinedDate: iso(BASE_DATE),
+  joinedDate: todayISO(),
   assignedMess: "",
 };
 
@@ -62,7 +62,7 @@ function AdminManagersPage() {
   const [confirmManager, setConfirmManager] = useState<AppUser | null>(null);
 
   function openAdd() {
-    setForm({ ...emptyManager, id: `MGR-${String(managers.length + 1).padStart(3, "0")}`, joinedDate: iso(BASE_DATE) });
+    setForm({ ...emptyManager, id: `MGR-${String(managers.length + 1).padStart(3, "0")}`, joinedDate: todayISO() });
     setErrors({});
     setAddOpen(true);
   }
@@ -82,7 +82,6 @@ function AdminManagersPage() {
     if (Object.keys(e).length > 0) return;
     upsertUser(form);
     logAction({ user: "Ravi Krishnan (Admin)", action: "Added mess manager", module: "Mess Managers", description: `${form.name} assigned to ${form.assignedMess}`, status: "Success" });
-    toast.success(`${form.name} added as mess manager`);
     setAddOpen(false);
   }
 
@@ -93,7 +92,6 @@ function AdminManagersPage() {
     if (Object.keys(e).length > 0) return;
     upsertUser(editManager);
     logAction({ user: "Ravi Krishnan (Admin)", action: "Updated mess manager", module: "Mess Managers", description: `${editManager.name} details updated`, status: "Success" });
-    toast.success("Manager details updated");
     setEditManager(null);
   }
 

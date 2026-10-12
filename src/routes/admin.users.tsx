@@ -32,7 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useApp } from "@/store/app-store";
-import { formatDate, iso, BASE_DATE } from "@/data/mock";
+import { formatDate, todayISO } from "@/data/mock";
 import type { AppUser, Role } from "@/data/types";
 import { Plus, Search } from "lucide-react";
 
@@ -55,7 +55,7 @@ const emptyUser: AppUser = {
   contact: "",
   role: "student",
   status: "Active",
-  joinedDate: iso(BASE_DATE),
+  joinedDate: todayISO(),
 };
 
 function AdminUsersPage() {
@@ -85,7 +85,7 @@ function AdminUsersPage() {
   }, [users, search, roleFilter, statusFilter]);
 
   function openAdd() {
-    setForm({ ...emptyUser, id: `STU-${String(users.length + 1).padStart(3, "0")}`, joinedDate: iso(BASE_DATE) });
+    setForm({ ...emptyUser, id: `STU-${String(users.length + 1).padStart(3, "0")}`, joinedDate: todayISO() });
     setErrors({});
     setAddOpen(true);
   }
@@ -104,7 +104,6 @@ function AdminUsersPage() {
     if (Object.keys(e).length > 0) return;
     upsertUser(form);
     logAction({ user: "Ravi Krishnan (Admin)", action: "Added user", module: "Users", description: `${form.name} (${form.id}) added as ${form.role}`, status: "Success" });
-    toast.success(`${form.name} added successfully`);
     setAddOpen(false);
   }
 
@@ -115,7 +114,6 @@ function AdminUsersPage() {
     if (Object.keys(e).length > 0) return;
     upsertUser(editUser);
     logAction({ user: "Ravi Krishnan (Admin)", action: "Updated user", module: "Users", description: `${editUser.name} (${editUser.id}) details updated`, status: "Success" });
-    toast.success("User details updated");
     setEditUser(null);
   }
 

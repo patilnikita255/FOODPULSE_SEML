@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, formatDate, formatMoney } from "@/data/mock";
+import { formatDate, formatMoney } from "@/data/mock";
 
 export const Route = createFileRoute("/student/bill")({
   head: () => ({
     meta: [
       { title: "Current Bill — FoodPulse Student Portal" },
-      { name: "description", content: "View your current bill and mark demo payments." },
+      { name: "description", content: "View your current bill and report a payment for mess verification." },
       { property: "og:title", content: "Current Bill — FoodPulse Student Portal" },
       { property: "og:description", content: "Check payment status and instructions for your mess bill." },
     ],
@@ -23,18 +23,18 @@ export const Route = createFileRoute("/student/bill")({
 });
 
 function BillPage() {
-  const { payments, setPaymentStatus } = useApp();
+  const { payments, setPaymentStatus, currentUserId } = useApp();
   const [showInstructions, setShowInstructions] = useState(false);
 
   const bill = useMemo(
-    () => payments.filter((p) => p.studentId === CURRENT_STUDENT_ID).sort((a, b) => (a.date < b.date ? 1 : -1))[0],
-    [payments],
+    () => payments.filter((p) => p.studentId === currentUserId).sort((a, b) => (a.date < b.date ? 1 : -1))[0],
+    [payments, currentUserId],
   );
 
   const markPaid = () => {
     if (!bill) return;
     setPaymentStatus(bill.id, "Paid");
-    toast.success("Marked as paid (demo payment)");
+    toast.success("Payment reported. The mess team will verify it.");
   };
 
   return (
@@ -48,8 +48,7 @@ function BillPage() {
       <div className="fp-surface flex items-start gap-3 p-4">
         <Info className="mt-0.5 size-4 shrink-0 text-info" />
         <p className="text-sm text-muted-foreground">
-          FoodPulse is a demo prototype — there is no real payment gateway. Use "Mark as Demo Payment" to simulate
-          a successful payment.
+          After paying the mess office, report your payment here. The mess team must verify it before the invoice is marked paid.
         </p>
       </div>
 
@@ -80,8 +79,8 @@ function BillPage() {
           <p className="mt-2 text-xs text-muted-foreground">Billed on {formatDate(bill.date)}</p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setShowInstructions(true)}>View Payment Instructions</Button>
-            <Button disabled={bill.status === "Paid"} onClick={markPaid}>
-              {bill.status === "Paid" ? "Already Paid" : "Mark as Demo Payment"}
+            <Button disabled={bill.status !== "Unpaid"} onClick={markPaid}>
+              {bill.status === "Paid" ? "Paid" : bill.status === "Pending" ? "Verification Pending" : "I have paid"}
             </Button>
           </div>
         </SectionCard>
@@ -91,13 +90,13 @@ function BillPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Payment Instructions</DialogTitle>
-            <DialogDescription>This is a demo — no real payment will be processed.</DialogDescription>
+            <DialogDescription>Pay the mess office using the method they provide, then report your payment for verification.</DialogDescription>
           </DialogHeader>
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>1. Visit the mess office counter or scan the campus UPI QR code (demo only).</p>
+            <p>1. Visit the mess office and ask for its current payment method.</p>
             <p>2. Pay the total amount shown on your invoice.</p>
-            <p>3. Ask the mess manager to confirm your payment, or use "Mark as Demo Payment" here to simulate it.</p>
-            <p>4. Your subscription status will update automatically once payment is marked as Paid.</p>
+            <p>3. Use the payment report button on this invoice. Your payment will be marked pending verification.</p>
+            <p>4. The mess manager will verify the payment and update the invoice status.</p>
           </div>
         </DialogContent>
       </Dialog>

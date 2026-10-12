@@ -54,7 +54,7 @@ export interface MealRecord {
   meal: MealType;
   menu: string;
   selection: MealSelection;
-  attendance: "Attended" | "Missed" | "Upcoming";
+  attendance: "Attended" | "Missed" | "Upcoming" | "Selected" | "Skipped";
   rating: number | null;
   feedback?: string;
 }
@@ -67,7 +67,7 @@ export interface Payment {
   planName: string;
   amount: number;
   date: string;
-  status: "Paid" | "Unpaid";
+  status: "Paid" | "Unpaid" | "Pending";
   baseAmount: number;
   adjustment: number;
 }

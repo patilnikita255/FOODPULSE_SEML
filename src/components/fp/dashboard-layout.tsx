@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Bell, LogOut, Menu, RotateCcw, Search, User as UserIcon } from "lucide-react";
+import { Bell, LogOut, Menu, Search, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -91,6 +91,14 @@ function NotificationBell({ role }: { role: Role }) {
     error: "bg-destructive",
     info: "bg-info",
   };
+  const markRead = async (id?: string) => {
+    try {
+      if (id) await markNotificationRead(id);
+      else await markAllRead(role);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update notifications.");
+    }
+  };
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -106,7 +114,7 @@ function NotificationBell({ role }: { role: Role }) {
       <PopoverContent align="end" className="w-[min(22rem,calc(100vw-2rem))] p-0">
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <p className="text-sm font-semibold">Notifications</p>
-          <Button variant="ghost" size="sm" onClick={() => markAllRead(role)}>
+          <Button variant="ghost" size="sm" onClick={() => void markRead()}>
             Mark all as read
           </Button>
         </div>
@@ -116,7 +124,7 @@ function NotificationBell({ role }: { role: Role }) {
               <li key={n.id}>
                 <button
                   type="button"
-                  onClick={() => markNotificationRead(n.id)}
+                  onClick={() => void markRead(n.id)}
                   className={cn("w-full px-4 py-3 text-left hover:bg-muted/60", !n.read && "bg-primary-soft/40")}
                 >
                   <div className="flex items-start gap-2.5">
@@ -242,7 +250,7 @@ function GlobalSearch({ role }: { role: Role }) {
 
 export function DashboardLayout({ role, children }: { role: Role; children: ReactNode }) {
   const ok = useRoleGuard(role);
-  const { currentUser, logout, resetDemoData } = useApp();
+  const { currentUser, logout } = useApp();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -254,10 +262,14 @@ export function DashboardLayout({ role, children }: { role: Role; children: Reac
     );
   }
 
-  const handleLogout = () => {
-    logout();
-    toast.success("Signed out of the FoodPulse demo");
-    navigate({ to: "/login", replace: true });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Signed out of FoodPulse");
+      navigate({ to: "/login", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to sign out.");
+    }
   };
 
   return (
@@ -270,7 +282,7 @@ export function DashboardLayout({ role, children }: { role: Role; children: Reac
           <SidebarNav role={role} />
         </ScrollArea>
         <div className="border-t border-sidebar-border p-3">
-          <p className="px-2 text-[11px] text-muted-foreground">Demo role</p>
+          <p className="px-2 text-[11px] text-muted-foreground">Signed in as</p>
           <p className="px-2 text-sm font-semibold">{roleLabel[role]}</p>
         </div>
       </aside>
@@ -318,15 +330,6 @@ export function DashboardLayout({ role, children }: { role: Role; children: Reac
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate({ to: `${roleHome[role]}/profile` })}>
                   <UserIcon className="mr-2 size-4" /> Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    resetDemoData();
-                    toast.success("Demo data reset to defaults");
-                    navigate({ to: "/login", replace: true });
-                  }}
-                >
-                  <RotateCcw className="mr-2 size-4" /> Reset demo data
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>

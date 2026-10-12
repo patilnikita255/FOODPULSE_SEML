@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/fp/status-badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, formatDate } from "@/data/mock";
+import { formatDate } from "@/data/mock";
 
 export const Route = createFileRoute("/student/complaints")({
   head: () => ({
@@ -20,12 +20,12 @@ export const Route = createFileRoute("/student/complaints")({
 });
 
 function ComplaintsPage() {
-  const { complaints } = useApp();
+  const { complaints, currentUserId } = useApp();
   const [status, setStatus] = useState("all");
 
   const mine = useMemo(
-    () => complaints.filter((c) => c.studentId === CURRENT_STUDENT_ID).sort((a, b) => (a.date < b.date ? 1 : -1)),
-    [complaints],
+    () => complaints.filter((c) => c.studentId === currentUserId).sort((a, b) => (a.date < b.date ? 1 : -1)),
+    [complaints, currentUserId],
   );
   const filtered = status === "all" ? mine : mine.filter((c) => c.status === status);
 

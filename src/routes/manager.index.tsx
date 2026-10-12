@@ -16,7 +16,7 @@ import { PageHeader, SectionCard } from "@/components/fp/page-header";
 import { KpiCard } from "@/components/fp/kpi-card";
 import { StatusBadge } from "@/components/fp/status-badge";
 import { useApp } from "@/store/app-store";
-import { addDays, BASE_DATE, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
+import { addDays, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
 import { MEAL_TYPES } from "@/data/types";
 import { last7Days, wastagePct } from "@/components/fp/manager/analytics-utils";
 
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/manager/")({
 function ManagerDashboard() {
   const { subscriptions, consumption } = useApp();
   const today = todayISO();
-  const tomorrow = iso(addDays(BASE_DATE, 1));
+  const tomorrow = iso(addDays(new Date(`${todayISO()}T00:00:00`), 1));
 
   const activeSubs = subscriptions.filter((s) => s.status === "Active").length;
   const pendingPayments = subscriptions.filter((s) => s.paymentStatus === "Unpaid").length;
@@ -169,7 +169,7 @@ function ManagerDashboard() {
                 ({Math.round(avgWeekend)} vs {Math.round(avgWeekday)} meals). Consider adjusting Friday/Saturday preparation
                 quantities to reduce wastage.
               </p>
-              <Link to="/manager/analytics" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
+              <Link to="/manager/wastage" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
                 Open Smart Analytics →
               </Link>
             </div>

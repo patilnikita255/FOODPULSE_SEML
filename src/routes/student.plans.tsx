@@ -107,7 +107,7 @@ function PlansPage() {
         open={!!target}
         onOpenChange={(o) => !o && setTarget(null)}
         title="Confirm subscription"
-        description={target ? `Subscribe to ${target.name} for ${formatMoney(target.price)} covering ${target.meals} meals over ${target.durationDays} days? This is a demo — no real payment will be charged.` : ""}
+        description={target ? `Subscribe to ${target.name} for ${formatMoney(target.price)} covering ${target.meals} meals over ${target.durationDays} days? An invoice will be created for mess verification.` : ""}
         confirmLabel="Subscribe"
         onConfirm={confirmSubscribe}
       />

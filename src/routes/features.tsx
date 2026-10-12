@@ -129,7 +129,7 @@ function FeaturesPage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/login">Login with a demo account</Link>
+              <Link to="/login">Sign in to your account</Link>
             </Button>
           </div>
         </div>

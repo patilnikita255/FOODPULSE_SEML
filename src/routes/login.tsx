@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap, ChefHat, ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight, GraduationCap, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,41 +8,73 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/fp/logo";
 import { useApp } from "@/store/app-store";
 import { roleHome } from "@/components/fp/nav-config";
-import type { Role } from "@/data/types";
+import { DEMO_ACCOUNTS } from "@/data/mock";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Login — FoodPulse Demo" },
-      { name: "description", content: "Sign in to the FoodPulse demo as a student, mess manager or administrator." },
-      { property: "og:title", content: "Login — FoodPulse Demo" },
-      { property: "og:description", content: "Try the FoodPulse mess management prototype with one-click demo accounts." },
+      { title: "Login | FoodPulse" },
+      { name: "description", content: "Sign in to your FoodPulse student, mess manager, or administrator account." },
+      { property: "og:title", content: "Login | FoodPulse" },
+      { property: "og:description", content: "Sign in to your FoodPulse account." },
     ],
   }),
   component: LoginPage,
 });
 
-const demoRoles: { role: Role; label: string; desc: string; icon: typeof GraduationCap }[] = [
-  { role: "student", label: "Login as Student", desc: "Meals, subscription, bills, feedback", icon: GraduationCap },
-  { role: "manager", label: "Login as Mess Manager", desc: "Menu, consumption, wastage, analytics", icon: ChefHat },
-  { role: "admin", label: "Login as Admin", desc: "Users, plans, reports, audit logs", icon: ShieldCheck },
-];
+const demoAccounts = [
+  {
+    role: "student",
+    label: "Login as Student",
+    description: "Meals, subscription, billing, feedback",
+    email: DEMO_ACCOUNTS.student.email,
+    password: "demo123",
+    icon: GraduationCap,
+  },
+  {
+    role: "manager",
+    label: "Login as Mess Manager",
+    description: "Menu, consumption, wastage, analytics",
+    email: DEMO_ACCOUNTS.manager.email,
+    password: "demo123",
+    icon: Users,
+  },
+  {
+    role: "admin",
+    label: "Login as Admin",
+    description: "Users, plans, reports, audit logs",
+    email: DEMO_ACCOUNTS.admin.email,
+    password: "demo123",
+    icon: ShieldCheck,
+  },
+] as const;
 
 function LoginPage() {
-  const { login } = useApp();
+  const { signIn } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const enter = (role: Role) => {
-    login(role);
-    toast.success(`Signed in to the ${role} demo`);
-    navigate({ to: roleHome[role] });
+  const loginDemoAccount = async (candidate: (typeof demoAccounts)[number]) => {
+    setEmail(candidate.email);
+    setPassword(candidate.password);
+    setErrors({});
+    setSubmitting(true);
+    try {
+      const role = await signIn(candidate.email, candidate.password);
+      toast.success("Signed in to FoodPulse demo account");
+      navigate({ to: roleHome[role] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to sign in with the demo account.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: { email?: string; password?: string } = {};
     if (!email.trim()) next.email = "Email is required";
@@ -50,8 +82,16 @@ function LoginPage() {
     if (!password) next.password = "Password is required";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    const role: Role = email.includes("admin") ? "admin" : email.includes("mess") || email.includes("manager") ? "manager" : "student";
-    enter(role);
+    setSubmitting(true);
+    try {
+      const role = await signIn(email, password);
+      toast.success("Signed in to FoodPulse");
+      navigate({ to: roleHome[role] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to sign in. Check your email and password.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -80,7 +120,7 @@ function LoginPage() {
           </dl>
         </div>
         <p className="text-xs text-muted-foreground">
-          Frontend demonstration prototype — no real authentication or payments.
+          Secure email sign-in for your FoodPulse account.
         </p>
       </div>
 
@@ -126,33 +166,39 @@ function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? "Signing in..." : "Login"}
             </Button>
           </form>
 
-          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" /> OR TRY A DEMO ACCOUNT <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <div className="space-y-2">
-            {demoRoles.map((d) => (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => enter(d.role)}
-                className="flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-primary/40 hover:bg-primary-soft/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-              >
-                <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
-                  <d.icon className="size-5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold">{d.label}</span>
-                  <span className="block truncate text-xs text-muted-foreground">{d.desc}</span>
-                </span>
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-              </button>
-            ))}
+          <div className="mt-8">
+            <div className="mb-4 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              Or try a demo account
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <div className="space-y-3">
+              {demoAccounts.map((account) => {
+                const Icon = account.icon;
+                return (
+                  <button
+                    key={account.role}
+                    type="button"
+                    onClick={() => void loginDemoAccount(account)}
+                    className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left transition-colors hover:border-primary/50 hover:bg-accent"
+                  >
+                    <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="size-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-base font-semibold text-foreground">{account.label}</span>
+                      <span className="block text-xs text-muted-foreground">{account.description}</span>
+                    </span>
+                    <ArrowRight className="size-4 text-muted-foreground" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">

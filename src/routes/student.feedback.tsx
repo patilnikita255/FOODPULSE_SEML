@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, todayISO } from "@/data/mock";
+import { todayISO } from "@/data/mock";
 import { MEAL_TYPES, type MealType } from "@/data/types";
 
 export const Route = createFileRoute("/student/feedback")({
@@ -49,7 +49,7 @@ function FeedbackPage() {
     }
     setFErrors({});
     addFeedback({
-      studentId: CURRENT_STUDENT_ID,
+      studentId: currentUser?.id ?? "",
       studentName: currentUser?.name ?? "Student",
       date: fDate,
       meal: fMeal,
@@ -69,7 +69,7 @@ function FeedbackPage() {
     }
     setCErrors({});
     addComplaint({
-      studentId: CURRENT_STUDENT_ID,
+      studentId: currentUser?.id ?? "",
       studentName: currentUser?.name ?? "Student",
       date: cDate,
       meal: cMeal,

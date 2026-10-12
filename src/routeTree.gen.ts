@@ -20,6 +20,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ManagerRouteImport } from './routes/manager'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
@@ -100,6 +101,11 @@ const ManagerRoute = ManagerRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentRoute = StudentRouteImport.update({
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manager': typeof ManagerRouteWithChildren
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRouteWithChildren
   '/admin/managers': typeof AdminManagersRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/plans': typeof AdminPlansRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manager': typeof ManagerRouteWithChildren
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRouteWithChildren
   '/admin/managers': typeof AdminManagersRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manager'
     | '/register'
+    | '/reset-password'
     | '/student'
     | '/admin/managers'
     | '/admin/payments'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/admin/managers'
     | '/admin/payments'
     | '/admin/plans'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manager'
     | '/register'
+    | '/reset-password'
     | '/student'
     | '/admin/managers'
     | '/admin/payments'
@@ -477,6 +489,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManagerRoute: typeof ManagerRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StudentRoute: typeof StudentRouteWithChildren
 }
 
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student': {
@@ -832,6 +852,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManagerRoute: ManagerRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StudentRoute: StudentRouteWithChildren,
 }
 export const routeTree = rootRouteImport

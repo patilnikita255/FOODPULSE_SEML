@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+const db = supabase as unknown as SupabaseClient;
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -37,6 +41,7 @@ function ContactPage() {
   const [form, setForm] = useState<FormState>({ name: "", email: "", subject: "", message: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -52,13 +57,28 @@ function ContactPage() {
     return next;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    setSubmitted(true);
-    toast.success("Message sent — the FoodPulse team will get back to you soon.");
+    setSubmitting(true);
+    try {
+      const { error } = await db.from("contact_submissions").insert({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        subject: form.subject.trim(),
+        message: form.message.trim(),
+      });
+      if (error) throw error;
+      setSubmitted(true);
+      toast.success("Message sent — the FoodPulse team will get back to you soon.");
+    } catch (error) {
+      console.error("Unable to submit contact message", error);
+      toast.error("We couldn't send your message. Please try again shortly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -74,7 +94,7 @@ function ContactPage() {
           as="h1"
           eyebrow="Contact us"
           title="We'd love to hear from you"
-          description="Questions about FoodPulse, feedback on the prototype, or a query for your mess office — send us a message."
+          description="Questions about FoodPulse, product feedback, or a query for your mess office — send us a message."
         />
       </Section>
 
@@ -148,8 +168,8 @@ function ContactPage() {
                   />
                   {errors.message && <p id="message-error" className="text-xs text-destructive">{errors.message}</p>}
                 </div>
-                <Button type="submit" size="lg">
-                  Send message
+                <Button type="submit" size="lg" disabled={submitting}>
+                  {submitting ? "Sending..." : "Send message"}
                 </Button>
               </form>
             )}
@@ -174,10 +194,9 @@ function ContactPage() {
               </ul>
             </div>
             <div className="fp-surface p-6">
-              <p className="font-semibold">Prefer to try it yourself?</p>
+              <p className="font-semibold">Already have a FoodPulse account?</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Use the demo login accounts to explore the student, mess manager and admin experiences without
-                waiting for a reply.
+                Sign in with your student, mess manager, or administrator account to continue.
               </p>
             </div>
           </div>

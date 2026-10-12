@@ -22,6 +22,7 @@ export const Route = createFileRoute("/register")({
 
 interface FormState {
   name: string;
+  organizationSlug: string;
   email: string;
   contact: string;
   password: string;
@@ -39,18 +40,22 @@ function strength(pw: string) {
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const { login } = useApp();
-  const [form, setForm] = useState<FormState>({ name: "", email: "", contact: "", password: "", confirm: "" });
+  const { signUp } = useApp();
+  const [form, setForm] = useState<FormState>({ name: "", organizationSlug: "", email: "", contact: "", password: "", confirm: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (k: keyof FormState, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const score = strength(form.password);
   const labels = ["Too weak", "Weak", "Fair", "Strong", "Very strong"];
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: Partial<Record<keyof FormState, string>> = {};
     if (!form.name.trim()) next.name = "Full name is required";
+    if (!/^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(form.organizationSlug.trim().toLowerCase())) {
+      next.organizationSlug = "Enter the organization code provided by your college or mess";
+    }
     if (!form.email.trim()) next.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = "Enter a valid email address";
     if (!/^[0-9+\s-]{10,15}$/.test(form.contact.trim())) next.contact = "Enter a valid contact number";
@@ -58,9 +63,27 @@ function RegisterPage() {
     if (form.password !== form.confirm) next.confirm = "Passwords do not match";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    login("student");
-    toast.success("Account created — welcome to FoodPulse!");
-    navigate({ to: "/student" });
+    setSubmitting(true);
+    try {
+      const needsEmailConfirmation = await signUp({
+        name: form.name,
+        organizationSlug: form.organizationSlug,
+        email: form.email,
+        phone: form.contact,
+        password: form.password,
+      });
+      if (needsEmailConfirmation) {
+        toast.success("Account created. Check your email to confirm it, then sign in.");
+        navigate({ to: "/login" });
+      } else {
+        toast.success("Account created — welcome to FoodPulse!");
+        navigate({ to: "/student" });
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to create your account.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -69,13 +92,14 @@ function RegisterPage() {
         <Logo />
         <h1 className="mt-6 font-display text-2xl font-semibold">Create your account</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Register as a student to subscribe to a mess plan. Demo only — no data leaves your browser.
+          Create a student account with your email. Your profile is securely stored in FoodPulse.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4" noValidate>
           {(
             [
               ["name", "Full name", "text", "Aarav Sharma"],
+              ["organizationSlug", "College / mess code", "text", "north-campus"],
               ["email", "Email", "email", "aarav.sharma@campus.edu.in"],
               ["contact", "Contact number", "tel", "+91 98450 12233"],
             ] as const
@@ -132,8 +156,8 @@ function RegisterPage() {
             {errors.confirm && <p className="text-xs text-destructive">{errors.confirm}</p>}
           </div>
 
-          <Button type="submit" className="w-full">
-            Create account
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Creating account..." : "Create account"}
           </Button>
         </form>
 

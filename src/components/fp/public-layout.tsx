@@ -95,16 +95,16 @@ export function PublicLayout({ children }: { children: ReactNode }) {
             </ul>
           </div>
           <div>
-            <p className="text-sm font-semibold">Demo access</p>
+            <p className="text-sm font-semibold">Account access</p>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/login" className="hover:text-foreground">Student demo</Link></li>
-              <li><Link to="/login" className="hover:text-foreground">Mess manager demo</Link></li>
-              <li><Link to="/login" className="hover:text-foreground">Admin demo</Link></li>
+              <li><Link to="/login" className="hover:text-foreground">Student sign in</Link></li>
+              <li><Link to="/login" className="hover:text-foreground">Mess manager sign in</Link></li>
+              <li><Link to="/login" className="hover:text-foreground">Admin sign in</Link></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
-          © 2026 FoodPulse · Frontend demonstration prototype — no real payments or backend services.
+          © 2026 FoodPulse · Secure meal and mess management.
         </div>
       </footer>
     </div>

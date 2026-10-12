@@ -29,7 +29,7 @@ const faqCategories: { category: string; items: { q: string; a: string }[] }[] =
     category: "Registration",
     items: [
       { q: "How do I create a FoodPulse account?", a: "Go to the Register page, enter your name, email and hostel/mess details, then set a password. You'll be redirected to your student dashboard." },
-      { q: "Can mess managers and admins register themselves?", a: "In this demo, manager and admin accounts are pre-provisioned. Use the demo login buttons on the Login page to explore those roles." },
+      { q: "Can mess managers and admins register themselves?", a: "An administrator invites staff accounts and assigns their FoodPulse role. Public registration creates student accounts only." },
     ],
   },
   {
@@ -64,7 +64,7 @@ const faqCategories: { category: string; items: { q: string; a: string }[] }[] =
     category: "Payments",
     items: [
       { q: "How do I check my bills?", a: "Go to Student → Billing to see invoices, amounts and payment status." },
-      { q: "What payment methods are supported?", a: "This prototype does not process real payments — invoices are marked Paid/Unpaid for demonstration. A real payment gateway is a planned future enhancement." },
+      { q: "What payment methods are supported?", a: "FoodPulse records offline payments reported by students and verified by mess staff. Online card or UPI checkout is not enabled." },
     ],
   },
   {
@@ -113,7 +113,7 @@ const quickStarts = [
     role: "manager",
     label: "Mess Manager Guide",
     steps: [
-      "Log in with the Mess Manager demo account from /login.",
+      "Ask a FoodPulse administrator to invite you as a Mess Manager, then sign in.",
       "Open Manager → Dashboard to see today's and tomorrow's expected headcount.",
       "Publish the day's menu from Manager → Menu Management.",
       "After service, record prepared/consumed quantities in Manager → Consumption.",
@@ -124,7 +124,7 @@ const quickStarts = [
     role: "admin",
     label: "Admin Guide",
     steps: [
-      "Log in with the Admin demo account from /login.",
+      "Ask a FoodPulse administrator to invite you as an Admin, then sign in.",
       "Manage accounts from Admin → Users (activate/deactivate students and managers).",
       "Create or edit subscription plans from Admin → Plans.",
       "Monitor payments across the system in Admin → Payments.",

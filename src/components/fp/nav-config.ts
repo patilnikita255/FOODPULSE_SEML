@@ -94,7 +94,7 @@ export const managerNav: NavGroup[] = [
   {
     label: "Insights",
     items: [
-      { label: "Smart Analytics", to: "/manager/analytics", icon: Sparkles },
+      { label: "Smart Analytics", to: "/manager/wastage", icon: Sparkles },
       { label: "Reports", to: "/manager/reports", icon: FileBarChart },
     ],
   },
@@ -126,10 +126,10 @@ export const adminNav: NavGroup[] = [
   {
     label: "Insights",
     items: [
-      { label: "Analytics", to: "/admin/analytics", icon: BarChart3 },
+      { label: "Analytics", to: "/admin", icon: BarChart3 },
       { label: "Reports", to: "/admin/reports", icon: FileBarChart },
       { label: "Feedback", to: "/admin/feedback", icon: MessageSquare },
-      { label: "Audit Logs", to: "/admin/audit-logs", icon: ShieldCheck },
+      { label: "Audit Logs", to: "/admin", icon: ShieldCheck },
     ],
   },
   {

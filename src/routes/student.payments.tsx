@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, formatDate, formatMoney } from "@/data/mock";
+import { formatDate, formatMoney } from "@/data/mock";
 import { exportCsv, printReport } from "@/lib/export";
 import type { Payment } from "@/data/types";
 
@@ -24,12 +24,12 @@ export const Route = createFileRoute("/student/payments")({
 });
 
 function PaymentsPage() {
-  const { payments } = useApp();
+  const { payments, currentUserId } = useApp();
   const [selected, setSelected] = useState<Payment | null>(null);
 
   const myPayments = useMemo(
-    () => payments.filter((p) => p.studentId === CURRENT_STUDENT_ID).sort((a, b) => (a.date < b.date ? 1 : -1)),
-    [payments],
+    () => payments.filter((p) => p.studentId === currentUserId).sort((a, b) => (a.date < b.date ? 1 : -1)),
+    [payments, currentUserId],
   );
 
   const handleExport = () => {

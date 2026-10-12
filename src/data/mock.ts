@@ -32,7 +32,14 @@ export function addDays(base: Date, days: number) {
   return d;
 }
 export function todayISO() {
-  return iso(BASE_DATE);
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "00";
+  return `${part("year")}-${part("month")}-${part("day")}`;
 }
 export function formatDate(dateStr: string) {
   const d = new Date(dateStr + "T00:00:00");

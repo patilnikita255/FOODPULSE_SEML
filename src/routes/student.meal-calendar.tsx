@@ -8,7 +8,7 @@ import { ConfirmDialog } from "@/components/fp/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, addDays, BASE_DATE, formatDate, iso, weekdayName } from "@/data/mock";
+import { addDays, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
 import { MEAL_TYPES, type MealType } from "@/data/types";
 
 export const Route = createFileRoute("/student/meal-calendar")({
@@ -26,12 +26,12 @@ export const Route = createFileRoute("/student/meal-calendar")({
 const LOCK_MSG = "Meal selection deadline has passed. This meal can no longer be changed.";
 
 function MealCalendarPage() {
-  const { meals, setMealSelection, isLocked, currentSubscription } = useApp();
+  const { meals, setMealSelection, isLocked, currentSubscription, currentUserId } = useApp();
   const [skipTarget, setSkipTarget] = useState<{ date: string; meal: MealType } | null>(null);
   const [lockedNotice, setLockedNotice] = useState<string | null>(null);
 
-  const dates = useMemo(() => Array.from({ length: 14 }, (_, i) => iso(addDays(BASE_DATE, i - 3))), []);
-  const myMeals = meals.filter((m) => m.studentId === CURRENT_STUDENT_ID);
+  const dates = useMemo(() => Array.from({ length: 14 }, (_, i) => iso(addDays(new Date(`${todayISO()}T00:00:00`), i - 3))), []);
+  const myMeals = meals.filter((m) => m.studentId === currentUserId);
   const subscriptionActive = currentSubscription?.status === "Active";
 
   const handleToggle = (date: string, meal: MealType, current: "Selected" | "Skipped") => {

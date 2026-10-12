@@ -97,7 +97,7 @@ function AboutPage() {
         <SectionHeading
           eyebrow="Roadmap"
           title="Future enhancements (not implemented)"
-          description="This prototype focuses on the core meal management workflow. The items below are planned ideas — not available in this demo."
+          description="The core meal management workflow is available now. These enhancements are planned for future releases."
         />
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
           {futureEnhancements.map((f) => (
@@ -112,13 +112,13 @@ function AboutPage() {
       <Section>
         <div className="fp-surface flex flex-col items-center gap-4 p-10 text-center">
           <h2 className="font-display text-2xl font-semibold">See it in action</h2>
-          <p className="max-w-lg text-muted-foreground">Explore the features or try a live demo account.</p>
+          <p className="max-w-lg text-muted-foreground">Explore the features or sign in to your FoodPulse account.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild>
               <Link to="/features">Explore Features</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/login">Try a Demo</Link>
+              <Link to="/login">Sign In</Link>
             </Button>
           </div>
         </div>

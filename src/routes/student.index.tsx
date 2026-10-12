@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/fp/status-badge";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { CURRENT_STUDENT_ID, addDays, BASE_DATE, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
+import { addDays, formatDate, iso, todayISO, weekdayName } from "@/data/mock";
 import { MEAL_TYPES } from "@/data/types";
 
 export const Route = createFileRoute("/student/")({
@@ -22,15 +22,15 @@ export const Route = createFileRoute("/student/")({
 });
 
 function StudentDashboard() {
-  const { currentSubscription, meals, notifications } = useApp();
+  const { currentSubscription, meals, notifications, currentUserId } = useApp();
   const today = todayISO();
-  const myMeals = meals.filter((m) => m.studentId === CURRENT_STUDENT_ID);
+  const myMeals = meals.filter((m) => m.studentId === currentUserId);
   const todayMeals = myMeals.filter((m) => m.date === today);
   const remaining = currentSubscription ? currentSubscription.totalMeals - currentSubscription.usedMeals : 0;
   const nextMeal = todayMeals.find((m) => m.selection === "Selected") ?? todayMeals[0];
   const myNotifications = notifications.filter((n) => n.role === "student").slice(0, 5);
 
-  const upcoming = Array.from({ length: 7 }, (_, i) => iso(addDays(BASE_DATE, i)));
+  const upcoming = Array.from({ length: 7 }, (_, i) => iso(addDays(new Date(`${today}T00:00:00`), i)));
 
   return (
     <div className="space-y-6">

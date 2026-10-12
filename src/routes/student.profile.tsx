@@ -20,7 +20,7 @@ export const Route = createFileRoute("/student/profile")({
 });
 
 function ProfilePage() {
-  const { currentUser, upsertUser, logout } = useApp();
+  const { currentUser, updateProfile, updatePassword, logout } = useApp();
   const navigate = useNavigate();
 
   const [name, setName] = useState(currentUser?.name ?? "");
@@ -32,20 +32,23 @@ function ProfilePage() {
   const [pwd, setPwd] = useState({ current: "", next: "", confirm: "" });
   const [pwdErrors, setPwdErrors] = useState<{ current?: string; next?: string; confirm?: string }>({});
 
-  const saveProfile = (e: React.FormEvent) => {
+  const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: typeof errors = {};
     if (!name.trim()) next.name = "Name is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Enter a valid email";
     if (!/^\+?\d[\d\s]{8,}$/.test(contact)) next.contact = "Enter a valid contact number";
     setErrors(next);
     if (Object.keys(next).length > 0 || !currentUser) return;
-    upsertUser({ ...currentUser, name: name.trim(), email: email.trim(), contact: contact.trim() });
-    toast.success("Profile updated");
-    setEditing(false);
+    try {
+      await updateProfile({ name, phone: contact });
+      toast.success("Profile updated");
+      setEditing(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update profile.");
+    }
   };
 
-  const savePassword = (e: React.FormEvent) => {
+  const savePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: typeof pwdErrors = {};
     if (!pwd.current) next.current = "Current password is required";
@@ -53,8 +56,13 @@ function ProfilePage() {
     if (pwd.confirm !== pwd.next) next.confirm = "Passwords do not match";
     setPwdErrors(next);
     if (Object.keys(next).length > 0) return;
-    toast.success("Password changed (demo only — no backend)");
-    setPwd({ current: "", next: "", confirm: "" });
+    try {
+      await updatePassword(pwd.current, pwd.next);
+      toast.success("Password updated");
+      setPwd({ current: "", next: "", confirm: "" });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update password.");
+    }
   };
 
   return (
@@ -70,8 +78,8 @@ function ProfilePage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" value={email} disabled={!editing} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!errors.email} />
-            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+            <Input id="email" type="email" value={email} disabled aria-describedby="email-note" />
+            <p id="email-note" className="text-xs text-muted-foreground">Email is managed by your sign-in provider.</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="contact">Contact Number</Label>
@@ -81,7 +89,7 @@ function ProfilePage() {
           {editing && (
             <div className="sm:col-span-2 flex gap-2">
               <Button type="submit">Save Changes</Button>
-              <Button type="button" variant="outline" onClick={() => { setEditing(false); setName(currentUser?.name ?? ""); setEmail(currentUser?.email ?? ""); setContact(currentUser?.contact ?? ""); setErrors({}); }}>
+              <Button type="button" variant="outline" onClick={() => { setEditing(false); setName(currentUser?.name ?? ""); setContact(currentUser?.contact ?? ""); setErrors({}); }}>
                 Cancel
               </Button>
             </div>
@@ -113,7 +121,7 @@ function ProfilePage() {
       </SectionCard>
 
       <SectionCard title="Session">
-        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={() => { logout(); toast.success("Signed out"); navigate({ to: "/login" }); }}>
+        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={async () => { await logout(); toast.success("Signed out"); navigate({ to: "/login" }); }}>
           Logout
         </Button>
       </SectionCard>

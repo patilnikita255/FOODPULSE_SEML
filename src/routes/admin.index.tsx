@@ -19,7 +19,7 @@ import { KpiCard } from "@/components/fp/kpi-card";
 import { StatusBadge } from "@/components/fp/status-badge";
 import { EmptyState } from "@/components/fp/states";
 import { useApp } from "@/store/app-store";
-import { formatMoney, monthlyTrends } from "@/data/mock";
+import { formatMoney } from "@/data/mock";
 import {
   CreditCard,
   IndianRupee,
@@ -49,8 +49,8 @@ function AdminDashboard() {
     const activeSubs = subscriptions.filter((s) => s.status === "Active").length;
     const managers = users.filter((u) => u.role === "manager");
     const activePlans = plans.filter((p) => p.status === "Active").length;
-    const totalPayments = payments.reduce((sum, p) => sum + p.amount, 0);
-    const pendingPayments = payments.filter((p) => p.status === "Unpaid").length;
+    const totalPayments = payments.filter((p) => p.status === "Paid").reduce((sum, p) => sum + p.amount, 0);
+    const pendingPayments = payments.filter((p) => p.status !== "Paid").length;
     return {
       students: students.length,
       activeSubs,
@@ -60,6 +60,19 @@ function AdminDashboard() {
       pendingPayments,
     };
   }, [users, subscriptions, plans, payments]);
+
+  const monthlyTrends = useMemo(() => {
+    const current = new Date();
+    return Array.from({ length: 6 }, (_, index) => {
+      const month = new Date(current.getFullYear(), current.getMonth() - (5 - index), 1);
+      const key = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`;
+      return {
+        month: month.toLocaleDateString("en-IN", { month: "short" }),
+        users: users.filter((user) => user.joinedDate.startsWith(key)).length,
+        subscriptions: subscriptions.filter((subscription) => subscription.startDate.startsWith(key)).length,
+      };
+    });
+  }, [users, subscriptions]);
 
   const mealDemand = useMemo(() => {
     const byDate = new Map<string, { date: string; expected: number; prepared: number; consumed: number }>();
@@ -165,7 +178,7 @@ function AdminDashboard() {
           title="Recent Audit Activity"
           description="Latest actions across the platform"
           actions={
-            <Link to="/admin/audit-logs" className="text-sm font-medium text-primary hover:underline">
+            <Link to="/admin" className="text-sm font-medium text-primary hover:underline">
               View all
             </Link>
           }
